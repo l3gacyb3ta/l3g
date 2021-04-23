@@ -3,6 +3,7 @@ require "option_parser"
 path = "."
 write_license = false
 commit = false
+topush = false
 
 # pretty putter
 def pretty_puts(text)
@@ -46,12 +47,16 @@ OptionParser.parse do |parser|
   end
 
   #sets up path
-  parser.on "-p PATH", "--path=PATH", "Specify path for command, defaults to ." do |_path|
+  parser.on "-d PATH", "--dir=PATH", "Specify path for command, defaults to ." do |_path|
     path = _path
   end
 
   parser.on "-c", "--commit", "Commit to git repo" do
     commit = true
+  end
+
+  parser.on "-p", "--push", do
+    topush = true
   end
 
   # Error handling
@@ -111,4 +116,9 @@ if commit
   system "git add #{path}"
   system "git commit -m \"Commited auto-magically because l3gacy was too lazy to actually write a commit message for this.\""
   exit
+end
+
+if topush
+  system "git push"
+  pretty_puts "pushed (hopefully)"
 end
