@@ -4,15 +4,33 @@ path = "."
 write_license = false
 commit = false
 
+# pretty putter
+def pretty_puts(text)
+  puts "----- #{text} -----"
+end
+
 OptionParser.parse do |parser|
   parser.banner = "L3gacy's toolkit"
 
+  parser.on "init", "initialize a new project" do
+
+    system "git init"
+    pretty_puts "Git repo initialized"
+    write_license = true
+  end
 
   #license generation
   parser.on "license", "Generate license" do 
     # Write license to file
     write_license = true
     # no exit, just continue
+  end
+
+  parser.on "git-config", "configure git with my info" do
+    #configures git with my info
+    system "git config --global user.email \"l3gacy.b3ta@disroot.org\""
+    system "git config --global user.name \"l3gacyb3ta\""
+    pretty_puts "git configured"
   end
 
   #Version info
@@ -74,13 +92,23 @@ For more information, please refer to <http://unlicense.org/>
 # If we need to write, then write license
 if write_license
   File.write(path + "/UNLICENSE", license)
-  puts "----- Written to #{path} -----"
+  pretty_puts "written license to #{path}"
   if commit
     # If commiting to a git repo
+    # add it
     system "git add #{path + "/UNLICENSE"}"
-    puts "----- Added #{path + "/UNLICENSE"} to git repo -----"
+    # oooo pretty
+    pretty_puts "added #{path + "/UNLICENSE"} to git repo"
+    # commit
     system "git commit -m \"Added license\""
-    puts "----- Commited to git repo -----"
+    # tell the user
+    pretty_puts "commited to git repo"
   end
+  exit
 end
 
+if commit
+  system "git add #{path}"
+  system "git commit -m \"Commited auto-magically because l3gacy was too lazy to actually write a commit message for this.\""
+  exit
+end
