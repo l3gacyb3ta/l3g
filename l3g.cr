@@ -55,7 +55,7 @@ OptionParser.parse do |parser|
     commit = true
   end
 
-  parser.on "-p", "--push", do
+  parser.on "-p", "--push", "turns on pushing after actions" do
     topush = true
   end
 
