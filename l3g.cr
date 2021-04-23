@@ -115,10 +115,12 @@ end
 if commit
   system "git add #{path}"
   system "git commit -m \"Commited auto-magically because l3gacy was too lazy to actually write a commit message for this.\""
-  exit
+  
 end
 
 if topush
   system "git push"
   pretty_puts "pushed (hopefully)"
 end
+
+exit
