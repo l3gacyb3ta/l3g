@@ -1,5 +1,6 @@
 require "option_parser"
 
+# --------------------------- Defaults ---------------------------
 # These are the default values used by the parser
 path = "."
 _write_license = false
@@ -109,6 +110,8 @@ def create_project(_type : String)
   end
 end
 
+# --------------------------- Parser for the cli ---------------------------
+
 OptionParser.parse do |parser|
   parser.banner = "L3gacy's toolkit"
 
@@ -176,6 +179,8 @@ OptionParser.parse do |parser|
     exit(1)
   end
 end
+
+# --------------------------- Flag functions ---------------------------
 
 # Debug runs if debug flag is set
 if _debug
