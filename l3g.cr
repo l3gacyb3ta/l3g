@@ -1,19 +1,22 @@
 require "option_parser"
 
+# These are the default values used by the parser
 path = "."
 write_license = false
 commit = false
 topush = false
+debug = false
 
 # Prints out text with cool dashes on the side
-def pretty_puts(text)
-  puts "----- #{text} -----"
+def pretty_puts(text : String)
+  width = 10
+  puts "-" * width + " #{text} " + "-" * width
 end
 
 # Determine if file is in path
 def in_path(file : String, path : String) : Bool
   # Creates a path item with the supplied path
-  path = Dir.new(path)
+  path = Dir.new path
   # Flags if the file has been found
   found = false
 
@@ -29,7 +32,17 @@ def in_path(file : String, path : String) : Bool
 end
 
 def install(path : String)
-  p! in_path "l3g", path
+  # Test for the binary in the local directory
+  if in_path "l3g", path
+    puts "The binary has been found! Commencing install process."
+    pretty_puts "Moving Binary to /usr/bin/"
+    puts "You may need to put in your password to move the file"
+    # Just run a command
+    system "sudo mv ./l3g /usr/bin/"
+    puts "Move has been attempted! The l3g command should work now."
+  else
+    puts "ERROR: The l3g binary is not avalible in the current directory"
+  end
 end
 
 OptionParser.parse do |parser|
@@ -55,6 +68,11 @@ OptionParser.parse do |parser|
     pretty_puts "git configured"
   end
 
+  # Installs the binary to /usr/bin
+  parser.on "install", "Install l3g to the user dir" do
+    install "."
+  end
+
   # Version info
   parser.on "-v", "--version", "Show version" do
     puts "version 0.1"
@@ -76,12 +94,12 @@ OptionParser.parse do |parser|
     commit = true
   end
 
-  parser.on "-p", "--push", "turns on pushing after actions" do
+  parser.on "-p", "--push", "Turns on pushing after actions" do
     topush = true
   end
 
-  parser.on "install", "Install l3g to the user dir" do
-    install "."
+  parser.on "-d", "--debug", "Does whatever I'm needing to debug" do
+    debug = true
   end
 
   # Error handling
@@ -93,35 +111,16 @@ OptionParser.parse do |parser|
 end
 
 # license is set here
-license = "This is free and unencumbered software released into the public domain.
+license = "Do whatever you want with this software. I don't want it"
 
-Anyone is free to copy, modify, publish, use, compile, sell, or
-distribute this software, either in source code form or as a compiled
-binary, for any purpose, commercial or non-commercial, and by any
-means.
-
-In jurisdictions that recognize copyright laws, the author or authors
-of this software dedicate any and all copyright interest in the
-software to the public domain. We make this dedication for the benefit
-of the public at large and to the detriment of our heirs and
-successors. We intend this dedication to be an overt act of
-relinquishment in perpetuity of all present and future rights to this
-software under copyright law.
-
-THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
-OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
-ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-OTHER DEALINGS IN THE SOFTWARE.
-
-For more information, please refer to <http://unlicense.org/>
-"
+#
+if debug
+  puts "Nothing here for now!"
+end
 
 # If we need to write, then write license
 if write_license
-  File.write(path + "/UNLICENSE", license)
+  File.write path + "/UNLICENSE", license
   pretty_puts "written license to #{path}"
   if commit
     # If commiting to a git repo
@@ -132,7 +131,7 @@ if write_license
     # commit
     system "git commit -m \"Added license\""
     # tell the user
-    pretty_puts "commited to git repo"
+    pretty_puts "Commited to git repo!"
   end
   exit
 end
