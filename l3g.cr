@@ -2,10 +2,10 @@ require "option_parser"
 
 # These are the default values used by the parser
 path = "."
-write_license = false
-commit = false
-topush = false
-debug = false
+_write_license = false
+_commit = false
+_topush = false
+_debug = false
 
 # Prints out text with cool dashes on the side
 def pretty_puts(text : String)
@@ -13,10 +13,21 @@ def pretty_puts(text : String)
   puts "-" * width + " #{text} " + "-" * width
 end
 
+# Commits the current path
+def commit()
+  system "git add #{path}"
+  system "git commit -m \"Commited auto-magically because l3gacy was too lazy to actually write a commit message for this.\""
+end
+
+def create_project()
+
+end
+
 # Determine if file is in path
 def in_path(file : String, path : String) : Bool
   # Creates a path item with the supplied path
   path = Dir.new path
+
   # Flags if the file has been found
   found = false
 
@@ -29,6 +40,12 @@ def in_path(file : String, path : String) : Bool
 
   # Return that
   found
+end
+
+def init()
+  pretty_puts "Create git repo"
+  system "git init"
+  pretty_puts "Commiting"
 end
 
 def install(path : String)
@@ -51,13 +68,17 @@ OptionParser.parse do |parser|
   parser.on "init", "initialize a new project" do
     system "git init"
     pretty_puts "Git repo initialized"
-    write_license = true
+    _write_license = true
+  end
+
+  parser.on "project", "Create a project" do
+    create_project
   end
 
   # license generation
   parser.on "license", "Generate license" do
     # Write license to file
-    write_license = true
+    _write_license = true
     # no exit, just continue
   end
 
@@ -73,9 +94,13 @@ OptionParser.parse do |parser|
     install "."
   end
 
+  parser.on "-i", "--init", "Initialize a directory, by git initing and git commiting what's already there." do
+    init
+  end
+
   # Version info
   parser.on "-v", "--version", "Show version" do
-    puts "version 0.1"
+    puts "version 0.3"
     exit
   end
 
@@ -91,15 +116,15 @@ OptionParser.parse do |parser|
   end
 
   parser.on "-c", "--commit", "Commit to git repo" do
-    commit = true
+    _commit = true
   end
 
   parser.on "-p", "--push", "Turns on pushing after actions" do
-    topush = true
+    _topush = true
   end
 
   parser.on "-d", "--debug", "Does whatever I'm needing to debug" do
-    debug = true
+    _debug = true
   end
 
   # Error handling
@@ -115,14 +140,14 @@ license = "Do whatever you want with this software. I don't want it"
 
 #
 if debug
-  puts "Nothing here for now!"
+  p! pretty_puts "Nothing here for now!"
 end
 
 # If we need to write, then write license
-if write_license
+if _write_license
   File.write path + "/UNLICENSE", license
   pretty_puts "written license to #{path}"
-  if commit
+  if _commit
     # If commiting to a git repo
     # add it
     system "git add #{path + "/UNLICENSE"}"
@@ -136,12 +161,13 @@ if write_license
   exit
 end
 
-if commit
-  system "git add #{path}"
-  system "git commit -m \"Commited auto-magically because l3gacy was too lazy to actually write a commit message for this.\""
+# This little block runs if the commit flag is added
+if _commit
+  commit
 end
 
-if topush
+# This little block runs if the push flag is added
+if _topush
   system "git push"
   pretty_puts "pushed (hopefully)"
 end
