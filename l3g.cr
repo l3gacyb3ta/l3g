@@ -7,20 +7,31 @@ _commit = false
 _topush = false
 _debug = false
 
+# --------------------------- Builtin functions ---------------------------
+
 # Prints out text with cool dashes on the side
 def pretty_puts(text : String)
   width = 10
   puts "-" * width + " #{text} " + "-" * width
 end
 
-# Commits the current path
-def commit()
-  system "git add #{path}"
+# Commits the path it's given
+def commit(_path : String)
+  system "git add #{_path}"
   system "git commit -m \"Commited auto-magically because l3gacy was too lazy to actually write a commit message for this.\""
+  pretty_puts "Commited #{_path} to the local repo"
 end
 
-def create_project()
+def write_license(_commit : Bool, _path : String)
+  # license is set here
+  license = "Do whatever you want with this software. I don't want it"
 
+  File.write _path + "/UNLICENSE", license
+  pretty_puts "Written license to #{_path}"
+  if _commit
+    # If commiting to a git repo
+    commit "UNLICENSE"
+  end
 end
 
 # Determine if file is in path
@@ -29,23 +40,25 @@ def in_path(file : String, path : String) : Bool
   path = Dir.new path
 
   # Flags if the file has been found
-  found = false
+  _found = false
 
   path.each do |itered|
     # If the file is the one were looking for, mark it as found
     if itered == file
-      found = true
+      _found = true
     end
   end
 
   # Return that
-  found
+  _found
 end
 
-def init()
+def init
   pretty_puts "Create git repo"
   system "git init"
   pretty_puts "Commiting"
+  commit "."
+  write_license true, "."
 end
 
 def install(path : String)
@@ -58,7 +71,18 @@ def install(path : String)
     system "sudo mv ./l3g /usr/bin/"
     puts "Move has been attempted! The l3g command should work now."
   else
-    puts "ERROR: The l3g binary is not avalible in the current directory"
+    STDERR.puts "ERROR: The l3g binary is not avalible in the current directory"
+    exit 1
+  end
+end
+
+def create_project(_type : String)
+  case _type
+  # When NextJs is the type of the project, this code runs
+  when "nextjs"
+    pretty_puts "Using yarn"
+    system "yarn create next-app"
+    write_license true, "."
   end
 end
 
@@ -66,13 +90,12 @@ OptionParser.parse do |parser|
   parser.banner = "L3gacy's toolkit"
 
   parser.on "init", "initialize a new project" do
-    system "git init"
-    pretty_puts "Git repo initialized"
+    init
     _write_license = true
   end
 
-  parser.on "project", "Create a project" do
-    create_project
+  parser.on "nextjs", "Create a new nextjs project" do
+    create_project "next"
   end
 
   # license generation
@@ -92,10 +115,6 @@ OptionParser.parse do |parser|
   # Installs the binary to /usr/bin
   parser.on "install", "Install l3g to the user dir" do
     install "."
-  end
-
-  parser.on "-i", "--init", "Initialize a directory, by git initing and git commiting what's already there." do
-    init
   end
 
   # Version info
@@ -135,38 +154,27 @@ OptionParser.parse do |parser|
   end
 end
 
-# license is set here
-license = "Do whatever you want with this software. I don't want it"
-
-#
-if debug
+# Debug runs if debug flag is set
+if _debug
   p! pretty_puts "Nothing here for now!"
 end
 
 # If we need to write, then write license
 if _write_license
-  File.write path + "/UNLICENSE", license
-  pretty_puts "written license to #{path}"
   if _commit
-    # If commiting to a git repo
-    # add it
-    system "git add #{path + "/UNLICENSE"}"
-    # oooo pretty
-    pretty_puts "added #{path + "/UNLICENSE"} to git repo"
-    # commit
-    system "git commit -m \"Added license\""
-    # tell the user
-    pretty_puts "Commited to git repo!"
+    write_license true, "."
+  else
+    write_license false, "."
   end
   exit
 end
 
-# This little block runs if the commit flag is added
+# This little block runs if the commit flag is true
 if _commit
-  commit
+  commit path
 end
 
-# This little block runs if the push flag is added
+# This little block runs if the push flag is true
 if _topush
   system "git push"
   pretty_puts "pushed (hopefully)"
