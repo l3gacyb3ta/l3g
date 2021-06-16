@@ -107,7 +107,6 @@ def create_project(_type : String)
     pretty_puts "Using yarn"
     system "yarn create next-app ."
     init
-    write_license true, "."
   end
 end
 
