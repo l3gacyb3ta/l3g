@@ -1,0 +1,19 @@
+name: l3g
+version: v0.3.0
+
+authors:
+  - name <l3gacy.b3ta@disroot.org>
+
+description: |
+  L3gacyb3ta's little cli.
+
+# dependencies:
+#   pg:
+#     github: will/crystal-pg
+#     version: "~> 0.5"
+
+# development_dependencies:
+#   webmock:
+#     github: manastech/webmock.cr
+
+# license: MIT

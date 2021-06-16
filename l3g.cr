@@ -103,9 +103,10 @@ end
 def create_project(_type : String)
   case _type
   # When NextJs is the type of the project, this code runs
-  when "nextjs"
+  when "next"
     pretty_puts "Using yarn"
-    system "yarn create next-app"
+    system "yarn create next-app ."
+    init
     write_license true, "."
   end
 end
