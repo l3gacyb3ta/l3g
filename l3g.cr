@@ -23,7 +23,7 @@ def commit(_path : String)
   pretty_puts "Commited #{_path} to the local repo"
 end
 
-def write_license(_commit : Bool, _path : String)
+def write_license(_path : String)
   # license is set here
   license = "This is free and unencumbered software released into the public domain.
 
@@ -52,10 +52,7 @@ For more information, please refer to <http://unlicense.org/>"
 
   File.write _path + "/UNLICENSE", license
   pretty_puts "Written license to #{_path}"
-  if _commit
-    # If commiting to a git repo
-    commit "UNLICENSE"
-  end
+
 end
 
 # Determine if file is in path
@@ -80,9 +77,9 @@ end
 def init
   pretty_puts "Create git repo"
   system "git init"
+  write_license "."
   pretty_puts "Commiting"
   commit "."
-  write_license true, "."
 end
 
 def install(path : String)
@@ -190,9 +187,10 @@ end
 # If we need to write, then write license
 if _write_license
   if _commit
-    write_license true, "."
+    write_license "."
+    commit "UNLICENSE"
   else
-    write_license false, "."
+    write_license "."
   end
   exit
 end
